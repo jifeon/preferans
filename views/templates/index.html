@@ -17,6 +17,8 @@
   <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
   <![endif]-->
 
+  <script type="text/javascript" src="/js/ui.js"></script>
+
   <!-- Le fav and touch icons -->
   <!--<link rel="shortcut icon" href="../assets/ico/favicon.ico">-->
   <!--<link rel="apple-touch-icon-precomposed" sizes="144x144" href="../assets/ico/apple-touch-icon-144-precomposed.png">-->
@@ -190,7 +192,7 @@
   <div class="row" style="margin-top:60px;">
     <div class="span10">
       <h3>Пуля</h3>
-      <canvas id="table" style="height: 600px;"></canvas>
+      <canvas id="pool" style="height: 600px; width: 970px;" width="970" height="600"></canvas>
     </div>
     <div class="span2">
       <h3>История</h3>
@@ -216,6 +218,27 @@
 <!--<script src="/assets/js/bootstrap-collapse.js"></script>-->
 <!--<script src="/assets/js/bootstrap-carousel.js"></script>-->
 <!--<script src="/assets/js/bootstrap-typeahead.js"></script>-->
+
+<script type="text/javascript">
+  draw_pool( 'pool', [
+    {name     : 'W',
+     heap     : 1,
+     pool     : 1,
+     whists   : [1,2,3] },
+    {name     : 'Ca',
+     heap    : 2,
+     pool     : 2,
+     whists   : [4,5,6] },
+    {name     : 'Sr',
+     heap    : 3,
+     pool     : 3,
+     whists   : [7,8,9] },
+    {name     : 'I',
+     heap    : 4,
+     pool     : 4,
+     whists   : [10,11,12] }
+  ]);
+</script>
 
 </body>
 </html>
