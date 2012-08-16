@@ -1,108 +1,210 @@
-function draw_pool( id, players ){
-  var ctx = $('#pool')[0].getContext('2d');
+var pref;
 
-  var line   = 2;
-  var width  = ctx.canvas.width;
-  var height = ctx.canvas.height;
+function init_ui(){
+  $('#player4')[0].disabled = true;
+  $('#game_types a').click(function (e) {
+    e.preventDefault();
+    $(this).tab('show');
+  });
+  pref = new Pref;
+}
 
-  ctx.strokeStyle = 'rgb(0,136,204)';
-  ctx.fillStyle   = 'white';
-  ctx.lineWidth   = line;
-  ctx.fillRect(0,0,width,height);
-  ctx.strokeRect(line-1, line-1, width-line-1, height-line-1);
 
-  // линии для вистов
-  ctx.beginPath();
-  ctx.moveTo(width/3, 2);
-  ctx.lineTo(width/3, height-2);
-  ctx.moveTo(width/3*2, 2);
-  ctx.lineTo(width/3*2, height-2);
-  ctx.moveTo(2, height/3);
-  ctx.lineTo(width-2, height/3);
-  ctx.moveTo(2, height/3*2);
-  ctx.lineTo(width-2, height/3*2);
-  ctx.stroke();
+function change_players_count( count ){
+  $('#player4')[0].disabled = count == 3;
+  pref.players_count = count;
+}
 
-  // пуля и гора
-  ctx.fillRect(width/6, height/6, width/3*2, height/3*2);
-  ctx.strokeRect(width/6, height/6, width/3*2, height/3*2);
-  ctx.strokeRect(width/4, height/4, width/2, height/2);
 
-  // диагоняли
-  ctx.beginPath();
-
-  ctx.moveTo(2, 2);
-  ctx.lineTo(width-2, height-2);
-  ctx.moveTo(2, height-2);
-  ctx.lineTo(width-2, 2);
-
-  // имена
-  ctx.moveTo(width/2+80, height/2);
-  ctx.arc(width/2, height/2, 80, 0, 360, false);
-
-  ctx.stroke();
-
-  // надписи
-  var text_pos = {
-    names : [
-      [ '', width/2-16, height/2-28 ],
-      [ '', width/2+26, height/2+13 ],
-      [ '', width/2-16, height/2+50 ],
-      [ '', width/2-58, height/2+13 ]
-    ],
-    heap : [
-      [ '', width/2-16, height/2-108 ],
-      [ '', width/2+136, height/2+13 ],
-      [ '', width/2-16, height/2+130 ],
-      [ '', width/2-168, height/2+13 ]
-    ],
-    pool : [
-      [ '', width/2-16, height/2-165 ],
-      [ '', width/2+266, height/2+13 ],
-      [ '', width/2-16, height/2+187 ],
-      [ '', width/2-298, height/2+13 ]
-    ],
-    whists : [
-      [
-        [ '', width/2-256, height/2-240 ],
-        [ '', width/2-16, height/2-240 ],
-        [ '', width/2+234, height/2-240 ],
-      ],[
-        [ '', width/2+380, height/2-150 ],
-        [ '', width/2+380, height/2+13 ],
-        [ '', width/2+380, height/2+163 ],
-      ],[
-        [ '', width/2+234, height/2+266 ],
-        [ '', width/2-16, height/2+266 ],
-        [ '', width/2-256, height/2+266 ],
-      ],[
-        [ '', width/2-396, height/2+163 ],
-        [ '', width/2-396, height/2+13 ],
-        [ '', width/2-396, height/2-150 ],
-      ]
-    ]
-  }
-
-  ctx.font = '26px sans-serif';
-  ctx.fillStyle   = 'black';
-
-  for (var i = 0; i < players.length; i++){
-    var args = text_pos.names[i];
-    args[0] = players[i].name.substr(0,2);
-    ctx.fillText.apply( ctx, args );
-
-    args = text_pos.heap[i];
-    args[0] = players[i].heap;
-    ctx.fillText.apply( ctx, args );
-
-    args = text_pos.pool[i];
-    args[0] = players[i].pool;
-    ctx.fillText.apply( ctx, args );
-
-    for (var w = 0; w < 3; w++){
-      args = text_pos.whists[i][w];
-      args[0] = players[i].whists[w];
-      ctx.fillText.apply( ctx, args );
+function start_game(){
+  var type = 1;
+  var players = [
+    {
+      name : $('#player1').val() || 'P1'
+    },{
+      name : $('#player2').val() || 'P2'
+    },{
+      name : $('#player3').val() || 'P3'
     }
+  ];
+
+  if ( pref.players_count == 4 ) players.push({
+    name : $('#player4').val() || 'P4'
+  });
+
+  pref.set_players( players );
+  pref.new_game();
+
+  show_game_space();
+}
+
+
+function show_game_space(){
+  $('#start_settings').hide();
+  for ( var i = 0, i_ln = pref.players.length; i<i_ln; i++ ){
+    $('#player'+i+'_name').text( pref.players[i].name );
   }
+  update_game_space();
+  $('#game_place').show();
+}
+
+
+function update_game_space(){
+  $('#shuffler').text( pref.shuffler.name );
+  $('#min_bid').text( pref.min_bid );
+  $('#all_pass').text( pref.in_all_pass ? 'В распасах' : 'Не в распасах' );
+
+  prepare_game( pref.current_game );
+}
+
+
+function prepare_game( game ){
+  prepare_game_switcher( game );
+  prepare_game_results( game );
+  draw_pool( 'pool', pref.players );
+}
+
+
+function change_game_type( type ){
+  var game = pref.current_game;
+  switch (type) {
+    case 7:
+    case 8:
+    case 9:
+    case 10:
+      game.bid  = type;
+      game.type = 'single';
+      break;
+
+    default:
+      game.type = type;
+  }
+
+  prepare_game_results( game );
+}
+
+
+function prepare_game_switcher( game ){
+  var game_type;
+
+  if ( game.type == 'single' ) game_type = ({
+    7 : 'seven',
+    8 : 'eight',
+    9 : 'nine',
+    10 : 'ten'
+  })[ game.bid ];
+  else game_type = game.type;
+
+  $('#game_types a[href="#' + game_type + '"]').tab('show');
+}
+
+
+function prepare_game_results( game ){
+  game.set_player_tricks();
+
+  // show current player switcher
+  if ( game.type == 'all_pass' ) {
+    $('#current_player').hide();
+  }
+  else {
+    var controls = $('#current_player .controls');
+    controls.empty();
+    for ( var i = 0, i_ln = game.players.length; i<i_ln; i++ ){
+      var player = game.players[i];
+      controls.append( [
+        '<button id="game_player_', player.id,'" class="btn" onclick="set_active_player(', player.id, ')">',
+          player.name,
+        '</button>'].join('') );
+    }
+    $('#game_player_' + game.player.id).button('toggle');
+
+    $('#current_player').show();
+
+    if ( game.type == 'single' ) update_visters( game, false );
+  }
+
+  // show visters switcher
+  $('#visters')[ game.type == 'single' ? 'show' : 'hide' ]();
+
+  update_tricks( game );
+}
+
+
+function set_active_player( id ){
+  var game = pref.current_game;
+  game.set_player( pref.get_player(id) );
+  update_visters( game );
+}
+
+
+function update_visters( game, upd_tricks ){
+  var controls = $('#visters .controls');
+  controls.empty();
+  for ( var i = 0, i_ln = game.players.length; i<i_ln; i++ ){
+    var player = game.players[i];
+    if ( player == game.player ) continue;
+
+    controls.append( [
+      '<button id="game_vister_', player.id,'" class="btn" onclick="set_vister(', player.id, ', this)">',
+      player.name,
+      '</button>'].join('') );
+  }
+
+  for ( i = 0, i_ln = game.visters.length; i<i_ln; i++ ){
+    $('#game_vister_' + game.visters[i].id).button('toggle');
+  }
+
+  if (upd_tricks !== false) update_tricks( game );
+}
+
+
+function set_vister( id, el ){
+  var enabled = !$(el).hasClass('active'); //статус к этому моменту не успевает смениться
+  var game = pref.current_game;
+  game[ enabled ? 'set_vister' : 'remove_vister' ]( pref.get_player(id) );
+  update_visters( game );
+}
+
+
+function update_tricks( game ){
+  for ( var i = 0; i<pref.players_count; i++ ){
+    var el      = $('#player'+i+'_tricks');
+    var player  = pref.players[i];
+
+    if ( game.is_player_count_tricks( player )) {
+      el.find('button:eq('+ game.get_player_tricks( player ) +')').button('toggle');
+      el.show();
+    }
+    else el.hide();
+  }
+
+  // играющего ставим в начала списка, чтоб было удобнее задавать количество взяток
+  if ( game.type != 'all_pass' ) {
+    var pl_el = $('#player'+game.player.id+'_tricks');
+    pl_el.prependTo( pl_el.parent() );
+  }
+}
+
+
+function set_tricks( player_id, tricks ){
+  var game   = pref.current_game;
+  var player = pref.get_player( player_id );
+  if ( game.type == 'all_pass' ) {
+    var tr = {};
+    tr[ player_id ] = tricks;
+    game.set_player_tricks(tr);
+  } else if ( game.player == player ) game.set_player_tricks( tricks );
+  else {
+    var tr = {};
+    tr[ player_id ] = tricks;
+    game.set_vister_tricks(tr);
+  }
+
+  update_tricks( game );
+}
+
+
+function apply_game(){
+  pref.apply_game();
+  update_game_space();
 }

@@ -17,7 +17,11 @@
   <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
   <![endif]-->
 
+  <script type="text/javascript" src="/js/pref.js"></script>
+  <script type="text/javascript" src="/js/game.js"></script>
+  <script type="text/javascript" src="/js/player.js"></script>
   <script type="text/javascript" src="/js/ui.js"></script>
+  <script type="text/javascript" src="/js/draw_pool.js"></script>
 
   <!-- Le fav and touch icons -->
   <!--<link rel="shortcut icon" href="../assets/ico/favicon.ico">-->
@@ -51,155 +55,197 @@
 
 <div class="container">
 
-  <div class="row">
-    <div class="btn-group span3 offset3" data-toggle="buttons-radio">
-      <button class="btn btn-large active">3 игрока</button>
-      <button class="btn btn-large">4 игрока</button>
+  <div id="start_settings">
+    <div class="row">
+      <div class="btn-group span3 offset3" data-toggle="buttons-radio">
+        <button onclick="change_players_count(3);" class="btn btn-large active">3 игрока</button>
+        <button onclick="change_players_count(4);" class="btn btn-large">4 игрока</button>
+      </div>
+
+      <div class="span3"><div class="btn-group" style="float: right;" data-toggle="buttons-radio">
+        <button onclick="pref.type = 'time';" class="btn btn-large">По времени</button>
+        <button onclick="pref.type = 11;" class="btn btn-large active">11</button>
+        <button onclick="pref.type = 21;" class="btn btn-large">21</button>
+      </div></div>
     </div>
 
-    <div class="span3"><div class="btn-group" style="float: right;" data-toggle="buttons-radio">
-      <button class="btn btn-large">По времени</button>
-      <button class="btn btn-large active">11</button>
-      <button class="btn btn-large">21</button>
+    <div class="row" style="margin-top:60px;"><div class="span6 offset3">
+      <form class="form-horizontal">
+        <fieldset>
+          <legend>Список игроков</legend>
+
+          <div class="control-group">
+            <label class="control-label" for="player1">Игрок 1:</label>
+            <div class="controls">
+              <input type="text" class="input-xlarge" id="player1">
+              <p class="help-block">Этот игрок будет сдавать первым</p>
+            </div>
+          </div>
+
+          <div class="control-group">
+            <label class="control-label" for="player2">Игрок 2:</label>
+            <div class="controls">
+              <input type="text" class="input-xlarge" id="player2">
+              <p class="help-block">Игроков надо записывать по часовой стрелке</p>
+            </div>
+          </div>
+
+          <div class="control-group">
+            <label class="control-label" for="player3">Игрок 3:</label>
+            <div class="controls">
+              <input type="text" class="input-xlarge" id="player3">
+            </div>
+          </div>
+
+          <div class="control-group">
+            <label class="control-label" for="player4">Игрок 4:</label>
+            <div class="controls">
+              <input type="text" class="input-xlarge disabled" id="player4" disabled="disabled">
+            </div>
+          </div>
+        </fieldset>
+      </form>
     </div></div>
-  </div>
 
-  <div class="row" style="margin-top:60px;"><div class="span6 offset3">
-    <form class="form-horizontal">
-      <fieldset>
-        <legend>Список игроков</legend>
-
-        <div class="control-group">
-          <label class="control-label" for="player1">Игрок 1:</label>
-          <div class="controls">
-            <input type="text" class="input-xlarge" id="player1">
-          </div>
-        </div>
-
-        <div class="control-group">
-          <label class="control-label" for="player2">Игрок 2:</label>
-          <div class="controls">
-            <input type="text" class="input-xlarge" id="player2">
-          </div>
-        </div>
-
-        <div class="control-group">
-          <label class="control-label" for="player3">Игрок 3:</label>
-          <div class="controls">
-            <input type="text" class="input-xlarge" id="player3">
-          </div>
-        </div>
-
-        <div class="control-group">
-          <label class="control-label" for="player4">Игрок 4:</label>
-          <div class="controls">
-            <input type="text" class="input-xlarge disabled" id="player4" disabled="disabled">
-          </div>
-        </div>
-      </fieldset>
-    </form>
-  </div></div>
-
-  <div class="row">
-    <button class="btn btn-large btn-success span2 offset5">Начать игру</button>
-  </div>
-
-  <hr style="margin: 100px 0;">
-
-  <div class="row">
-    <div class="span3">Сдает: <span id="shuffler">W</span></div>
-    <div class="span3">Выход: <span id="min_bid">8</span></div>
-    <div class="span3" id="all_pass">В распасах</div>
-  </div>
-
-  <div class="row" style="margin-top:60px;">
-    <div class="span3">
-      <h3>Игра</h3>
-      <ul class="nav nav-pills nav-stacked">
-        <li>
-          <a href="#">7</a>
-        </li>
-        <li><a href="#">8</a></li>
-        <li><a href="#">9</a></li>
-        <li><a href="#">10</a></li>
-        <li class="active"><a href="#">Распасы</a></li>
-        <li><a href="#">Мизер</a></li>
-      </ul>
+    <div class="row">
+      <button onclick="start_game();" class="btn btn-large btn-success span2 offset5">Начать игру</button>
     </div>
-    <div class="span9">
-      <h3>Результат</h3>
+  </div>
 
-      <div class="row" style="margin-top:20px;">
-        <div class="span1" style="font-weight:bold; padding-top:6px;">Играет</div>
-        <div class="span8">
-          <div class="controls btn-group" data-toggle="buttons-radio">
-            <button class="btn">W</button>
-            <button class="btn active">I</button>
-            <button class="btn">Ca</button>
-          </div>
-        </div>
+  <div id="game_place" style="display:none;">
+
+    <div class="row">
+      <div class="span3">Сдает: <span id="shuffler">W</span></div>
+      <div class="span3">Выход: <span id="min_bid">8</span></div>
+      <div class="span3" id="all_pass">В распасах</div>
+    </div>
+
+    <div class="row" style="margin-top:60px;">
+      <div class="span3">
+        <h3>Игра</h3>
+        <ul id="game_types" class="nav nav-pills nav-stacked" style="margin-top:20px;">
+          <li class="active">
+            <a onclick="change_game_type(7);" href="#seven">7</a>
+          </li>
+          <li><a onclick="change_game_type(8);" href="#eight">8</a></li>
+          <li><a onclick="change_game_type(9);" href="#nine">9</a></li>
+          <li><a onclick="change_game_type(10);" href="#ten">10</a></li>
+          <li><a onclick="change_game_type('all_pass');" href="#all_pass">Распасы</a></li>
+          <li><a onclick="change_game_type('misere');" href="#misere">Мизер</a></li>
+        </ul>
       </div>
+      <div class="span9">
+        <h3>Результаты</h3>
 
-      <div class="row" style="margin-top:20px;">
-        <div class="span1" style="font-weight:bold; padding-top:6px;">Вистуют</div>
-        <div class="span8">
-          <div class="controls btn-group" data-toggle="buttons-checkbox">
-            <button class="btn">W</button>
-            <button class="btn active">Ca</button>
+        <div id="current_player" class="row" style="margin-top:20px;">
+          <div class="span1" style="font-weight:bold; padding-top:6px;">Играет</div>
+          <div class="span8">
+            <div class="controls btn-group" data-toggle="buttons-radio"></div>
           </div>
         </div>
+
+        <div id="visters" class="row" style="margin-top:20px;">
+          <div class="span1" style="font-weight:bold; padding-top:6px;">Вистуют</div>
+          <div class="span8">
+            <div class="controls btn-group" data-toggle="buttons-checkbox"></div>
+          </div>
+        </div>
+
+        <div>
+        <div id="player0_tricks" class="row" style="margin-top:20px;">
+          <div id="player0_name" class="span1" style="font-weight:bold; padding-top:6px;"></div>
+          <div class="span8">
+            <div class="controls btn-group" data-toggle="buttons-radio">
+              <button onclick="set_tricks(0, 0);" class="btn active">0</button>
+              <button onclick="set_tricks(0, 1);" class="btn">1</button>
+              <button onclick="set_tricks(0, 2);" class="btn">2</button>
+              <button onclick="set_tricks(0, 3);" class="btn">3</button>
+              <button onclick="set_tricks(0, 4);" class="btn">4</button>
+              <button onclick="set_tricks(0, 5);" class="btn">5</button>
+              <button onclick="set_tricks(0, 6);" class="btn">6</button>
+              <button onclick="set_tricks(0, 7);" class="btn">7</button>
+              <button onclick="set_tricks(0, 8);" class="btn">8</button>
+              <button onclick="set_tricks(0, 9);" class="btn">9</button>
+              <button onclick="set_tricks(0, 10);" class="btn">10</button>
+            </div>
+          </div>
+        </div>
+
+        <div id="player1_tricks" class="row" style="margin-top:20px;">
+          <div id="player1_name" class="span1" style="font-weight:bold; padding-top:6px;"></div>
+          <div class="span8">
+            <div class="controls btn-group" data-toggle="buttons-radio">
+              <button onclick="set_tricks(1, 0);" class="btn active">0</button>
+              <button onclick="set_tricks(1, 1);" class="btn">1</button>
+              <button onclick="set_tricks(1, 2);" class="btn">2</button>
+              <button onclick="set_tricks(1, 3);" class="btn">3</button>
+              <button onclick="set_tricks(1, 4);" class="btn">4</button>
+              <button onclick="set_tricks(1, 5);" class="btn">5</button>
+              <button onclick="set_tricks(1, 6);" class="btn">6</button>
+              <button onclick="set_tricks(1, 7);" class="btn">7</button>
+              <button onclick="set_tricks(1, 8);" class="btn">8</button>
+              <button onclick="set_tricks(1, 9);" class="btn">9</button>
+              <button onclick="set_tricks(1, 10);" class="btn">10</button>
+            </div>
+          </div>
+        </div>
+
+        <div id="player2_tricks" class="row" style="margin-top:20px;">
+          <div id="player2_name" class="span1" style="font-weight:bold; padding-top:6px;"></div>
+          <div class="span8">
+            <div class="controls btn-group" data-toggle="buttons-radio">
+              <button onclick="set_tricks(2, 0);" class="btn active">0</button>
+              <button onclick="set_tricks(2, 1);" class="btn">1</button>
+              <button onclick="set_tricks(2, 2);" class="btn">2</button>
+              <button onclick="set_tricks(2, 3);" class="btn">3</button>
+              <button onclick="set_tricks(2, 4);" class="btn">4</button>
+              <button onclick="set_tricks(2, 5);" class="btn">5</button>
+              <button onclick="set_tricks(2, 6);" class="btn">6</button>
+              <button onclick="set_tricks(2, 7);" class="btn">7</button>
+              <button onclick="set_tricks(2, 8);" class="btn">8</button>
+              <button onclick="set_tricks(2, 9);" class="btn">9</button>
+              <button onclick="set_tricks(2, 10);" class="btn">10</button>
+            </div>
+          </div>
+        </div>
+
+        <div id="player3_tricks" class="row" style="margin-top:20px; display: none;">
+          <div id="player3_name" class="span1" style="font-weight:bold; padding-top:6px;"></div>
+          <div class="span8">
+            <div class="controls btn-group" data-toggle="buttons-radio">
+              <button onclick="set_tricks(3, 0);" class="btn active">0</button>
+              <button onclick="set_tricks(3, 1);" class="btn">1</button>
+              <button onclick="set_tricks(3, 2);" class="btn">2</button>
+              <button onclick="set_tricks(3, 3);" class="btn">3</button>
+              <button onclick="set_tricks(3, 4);" class="btn">4</button>
+              <button onclick="set_tricks(3, 5);" class="btn">5</button>
+              <button onclick="set_tricks(3, 6);" class="btn">6</button>
+              <button onclick="set_tricks(3, 7);" class="btn">7</button>
+              <button onclick="set_tricks(3, 8);" class="btn">8</button>
+              <button onclick="set_tricks(3, 9);" class="btn">9</button>
+              <button onclick="set_tricks(3, 10);" class="btn">10</button>
+            </div>
+          </div>
+        </div></div>
+
       </div>
+    </div>
 
-      <table class="table" style="margin-top:20px;">
-        <thead>
-        <tr>
-          <th>Игрок</th>
-          <th>Взятки</th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr>
-          <td>W</td>
-          <td>
-            <span class="badge badge-info">0</span>
-            <span class="badge badge-info">1</span>
-            <span class="badge">2</span>
-            <span class="badge">3</span>
-            <span class="badge">4</span>
-            <span class="badge">5</span>
-          </td>
-        </tr>
-        <tr>
-          <td>W</td>
-          <td>
-            <span class="badge badge-info">0</span>
-            <span class="badge badge-info">1</span>
-            <span class="badge">2</span>
-            <span class="badge">3</span>
-            <span class="badge">4</span>
-            <span class="badge">5</span>
-          </td>
-        </tr>
-        </tbody>
-      </table>
+    <div class="row" style="margin-top:60px;">
+      <button onclick="apply_game();" class="btn btn-large btn-success span2 offset5">Записать</button>
+    </div>
+
+    <div class="row" style="margin-top:60px;">
+      <div class="span10">
+        <h3>Пуля</h3>
+        <canvas id="pool" style="height: 600px; width: 970px;" width="970" height="600"></canvas>
+      </div>
+      <div class="span2">
+        <h3>История</h3>
+
+      </div>
     </div>
   </div>
-
-  <div class="row">
-    <button class="btn btn-large btn-success span2 offset5">Записать</button>
-  </div>
-
-  <div class="row" style="margin-top:60px;">
-    <div class="span10">
-      <h3>Пуля</h3>
-      <canvas id="pool" style="height: 600px; width: 970px;" width="970" height="600"></canvas>
-    </div>
-    <div class="span2">
-      <h3>История</h3>
-
-    </div>
-  </div>
-
 </div> <!-- /container -->
 
 <!-- Le javascript
@@ -211,7 +257,7 @@
 <!--<script src="/assets/js/bootstrap-modal.js"></script>-->
 <!--<script src="/assets/js/bootstrap-dropdown.js"></script>-->
 <!--<script src="/assets/js/bootstrap-scrollspy.js"></script>-->
-<!--<script src="/assets/js/bootstrap-tab.js"></script>-->
+<script src="/assets/js/bootstrap-tab.js"></script>
 <!--<script src="/assets/js/bootstrap-tooltip.js"></script>-->
 <!--<script src="/assets/js/bootstrap-popover.js"></script>-->
 <script src="/assets/js/bootstrap-button.js"></script>
@@ -220,24 +266,7 @@
 <!--<script src="/assets/js/bootstrap-typeahead.js"></script>-->
 
 <script type="text/javascript">
-  draw_pool( 'pool', [
-    {name     : 'W',
-     heap     : 1,
-     pool     : 1,
-     whists   : [1,2,3] },
-    {name     : 'Ca',
-     heap    : 2,
-     pool     : 2,
-     whists   : [4,5,6] },
-    {name     : 'Sr',
-     heap    : 3,
-     pool     : 3,
-     whists   : [7,8,9] },
-    {name     : 'I',
-     heap    : 4,
-     pool     : 4,
-     whists   : [10,11,12] }
-  ]);
+  init_ui();
 </script>
 
 </body>
